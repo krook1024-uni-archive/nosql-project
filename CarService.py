@@ -91,6 +91,10 @@ class CarService:
         return token
 
     def mechanic_count_logged_in(self):
+        """
+        Count logged in users.
+        :return:
+        """
         logged_in_n = self.r.pfcount("mechanic:login")
         if logged_in_n == 0 or logged_in_n > 1:
             print(
@@ -106,11 +110,17 @@ class CarService:
             )
 
     def mechanic_invalidate_tokens(self):
+        """
+        Invalidate all current tokens.
+        """
         self.r.delete("mechanic:tokens")
         self.r.delete("mechanic:login")
         print("[Mechanic] Invalidated all tokens!")
 
     def mechanic_describe(self, mechanic_token):
+        """
+        Describe current mechanic.
+        """
         if not self.r.hexists("mechanic:tokens", mechanic_token):
             return print("[Mechanic] Describe: This token does not exist!")
 
@@ -122,6 +132,9 @@ class CarService:
         )
 
     def mechanic_reset_password(self, mechanic_name, new_password):
+        """
+        Reset password for mechanic.
+        """
         if not self.r.sismember("mechanic:names", mechanic_name):
             return print(
                 "[Mechanic] No mechanic with the name '"
@@ -139,6 +152,9 @@ class CarService:
         )
 
     def mechanic_get_parts_replaced(self, mechanic_token):
+        """
+        Get the cost of the parts replaced by mechanic in total.
+        """
         if not self.r.hexists("mechanic:tokens", mechanic_token):
             return print("[Order] Add Note: This token does not exist!")
 
@@ -264,6 +280,11 @@ class CarService:
         self.order_invoice(order_id, expected_or_total="total")
 
     def order_delete_completed(self):
+        """
+        Delete completed orders and create a file to store the data in a
+        persistent database (MySQL).
+        :return:
+        """
         if self.r.llen("order:completed") > self.MAX_COMPLETED_ORDERS_IN_MEMORY:
             for order_id in self.r.lrange("order:completed", 0, -1):
                 order: dict = self.r.hgetall("order:" + order_id)
@@ -300,6 +321,9 @@ class CarService:
                 self.r.lrem("order:completed", 0, order_id)
 
     def order_status(self, order_id):
+        """
+        Query order status.
+        """
         if not self.r.sismember("order:ids", order_id):
             return print(
                 "[Order] Status: Order with the id '"
@@ -325,6 +349,9 @@ class CarService:
         self.order_invoice(order_id)
 
     def order_invoice(self, order_id, expected_or_total="expected"):
+        """
+        Generate the invoice for an order.
+        """
         order_notes: tuple = self.r.zrange(
             "order:notes:" + order_id, 0, -1, withscores=True
         )
@@ -340,6 +367,9 @@ class CarService:
                 print("Total cost: {} HUF".format(order_sum))
 
     def order_list(self, mechanic_token):
+        """
+        List all orders.
+        """
         if not self.r.hexists("mechanic:tokens", mechanic_token):
             return print("[Order] List: This token does not exist!")
 
