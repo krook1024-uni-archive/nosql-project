@@ -4,17 +4,27 @@ driver = CarService()
 
 driver.clean()
 
+# Get logged in users
+driver.mechanic_count_logged_in()
+
 # Create a new mechanic
 driver.mechanic_create("Johnny", "secret")
 driver.mechanic_create("Mike", "secret")
+driver.mechanic_create("ToBeDeleted", "secret")
 
 # Create a new mechanic - failure (duplicate name)
 driver.mechanic_create("Johnny", "secret")
+
+# Delete mechanic
+driver.mechanic_delete("ToBeDeleted")
 
 # Login as mechanic
 mechanic_token = driver.mechanic_login("Johnny", "secret")
 if mechanic_token:
     print("Logged in with token " + mechanic_token)
+
+# Get logged in users
+driver.mechanic_count_logged_in()
 
 mechanic2_token = driver.mechanic_login("Mike", "secret")
 if mechanic_token:
@@ -73,3 +83,12 @@ driver.mechanic_top()
 # Get parts replaced in total
 driver.mechanic_get_parts_replaced(mechanic_token)
 driver.mechanic_get_parts_replaced(mechanic2_token)
+
+# Get logged in users
+driver.mechanic_count_logged_in()
+
+# Invalidate all sessions
+driver.mechanic_invalidate_tokens()
+
+# Get logged in users
+driver.mechanic_count_logged_in()

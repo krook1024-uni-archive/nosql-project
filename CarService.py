@@ -21,7 +21,7 @@ class CarService:
         Create a new mechanic.
         """
 
-        if name == "tokens" or name == "names":
+        if name == "tokens" or name == "names" or name == "login":
             return print("[Mechanic] Create: Invalid name")
 
         if self.r.sismember("mechanic:names", name):
@@ -40,6 +40,31 @@ class CarService:
             "[Mechanic] Create: Mechanic with the name '"
             + name
             + "' created successfully!"
+        )
+
+    def mechanic_delete(self, mechanic_name):
+        """
+        Delete a mechanic and their tokens.
+        :param mechanic_name: The name of the mechanic
+        """
+        if not self.r.sismember("mechanic:names", mechanic_name):
+            return print(
+                "[Mechanic] No mechanic with the name '"
+                + mechanic_name
+                + "' exists!"
+            )
+
+        self.r.delete("mechanic:" + mechanic_name)
+        self.r.zrem("parts_replaced", mechanic_name)
+        for mechanic_token, mechanic_name in self.r.hscan_iter(
+            "mechanic:tokens", mechanic_name
+        ):
+            self.r.hdel("mechanic:tokens", mechanic_token)
+
+        print(
+            "[Mechanic] Delete: Successfully deleted '{}'!".format(
+                mechanic_name
+            )
         )
 
     def mechanic_login(self, name, password):
@@ -62,7 +87,28 @@ class CarService:
 
         token = uuid.uuid4().__str__()
         self.r.hset("mechanic:tokens", token, name)
+        self.r.pfadd("mechanic:login", name)
         return token
+
+    def mechanic_count_logged_in(self):
+        logged_in_n = self.r.pfcount("mechanic:login")
+        if logged_in_n == 0 or logged_in_n > 1:
+            print(
+                "[Mechanic] There are {} logged in users at the moment.".format(
+                    logged_in_n
+                )
+            )
+        else:
+            print(
+                "[Mechanic] There is {} logged in user at the moment.".format(
+                    logged_in_n
+                )
+            )
+
+    def mechanic_invalidate_tokens(self):
+        self.r.delete("mechanic:tokens")
+        self.r.delete("mechanic:login")
+        print("[Mechanic] Invalidated all tokens!")
 
     def mechanic_describe(self, mechanic_token):
         if not self.r.hexists("mechanic:tokens", mechanic_token):
