@@ -64,6 +64,59 @@ class CarService:
         self.r.hset("mechanic:tokens", token, name)
         return token
 
+    def mechanic_describe(self, mechanic_token):
+        if not self.r.hexists("mechanic:tokens", mechanic_token):
+            return print("[Mechanic] Describe: This token does not exist!")
+
+        mechanic_name = self.r.hget("mechanic:tokens", mechanic_token)
+
+        print(
+            "[Mechanic] Describe: Currently logged in with account "
+            + mechanic_name
+        )
+
+    def mechanic_reset_password(self, mechanic_name, new_password):
+        if not self.r.sismember("mechanic:names", mechanic_name):
+            return print(
+                "[Mechanic] No mechanic with the name '"
+                + mechanic_name
+                + "' exists!"
+            )
+
+        self.r.hset(
+            "mechanic:" + mechanic_name, mapping={"password": new_password}
+        )
+        print(
+            "[Mechanic] Password reset: New password '{}' set for mechanic '{}'".format(
+                new_password, mechanic_name
+            )
+        )
+
+    def mechanic_get_parts_replaced(self, mechanic_token):
+        if not self.r.hexists("mechanic:tokens", mechanic_token):
+            return print("[Order] Add Note: This token does not exist!")
+
+        mechanic_name = self.r.hget("mechanic:tokens", mechanic_token)
+
+        found = False
+
+        for mechanic, cost in self.r.zscan_iter(
+            "parts_replaced", mechanic_name
+        ):
+            found = True
+            print(
+                "[Mechanic] {} has replaced parts for {} HUF in total.".format(
+                    mechanic, cost
+                )
+            )
+
+        if not found:
+            print(
+                "[Mechanic] {} has not replaced any parts yet.".format(
+                    mechanic_name
+                )
+            )
+
     def mechanic_top(self):
         """
         List the best working mechanics in the shop!
@@ -76,7 +129,11 @@ class CarService:
         for mechanic, earning in self.r.zrevrange(
             "parts_replaced", 0, 4, withscores=True
         ):
-            print("{}. {} has made {} HUF".format(i, mechanic, earning))
+            print(
+                "{}. {} has replaced parts for {} HUF".format(
+                    i, mechanic, earning
+                )
+            )
             i = i + 1
 
     def order_record(
@@ -115,10 +172,10 @@ class CarService:
         :param cost: Cost of the replacement and the part.
         """
         if not self.r.hexists("mechanic:tokens", mechanic_token):
-            return print("[Order]: Add Note: This token does not exist!")
+            return print("[Order] Add Note: This token does not exist!")
 
         if not self.r.sismember("order:ids", order_id):
-            return print("[Order]: Add Note: This order does not exist!")
+            return print("[Order] Add Note: This order does not exist!")
 
         self.r.zadd(
             "order:notes:" + order_id,
@@ -148,7 +205,7 @@ class CarService:
 
         if not self.r.hexists("mechanic:tokens", mechanic_token):
             return print(
-                "[Order]: Complete: The token '"
+                "[Order] Complete: The token '"
                 + mechanic_token
                 + "' does not exist!"
             )
@@ -238,7 +295,7 @@ class CarService:
 
     def order_list(self, mechanic_token):
         if not self.r.hexists("mechanic:tokens", mechanic_token):
-            return print("[Order]: List: This token does not exist!")
+            return print("[Order] List: This token does not exist!")
 
         for order_id in self.r.smembers("order:ids"):
             print(order_id)

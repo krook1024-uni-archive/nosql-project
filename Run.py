@@ -18,10 +18,21 @@ if mechanic_token:
 
 mechanic2_token = driver.mechanic_login("Mike", "secret")
 if mechanic_token:
-    print("Logged in with token " + mechanic_token)
+    print("Logged in with token " + mechanic2_token)
+
 
 # Login as mechanic -- failure
 mechanic_token_failure = driver.mechanic_login("asd", "asdQWE123")
+
+# Describe account
+driver.mechanic_describe(mechanic_token)
+
+# Get parts replaced in total
+driver.mechanic_get_parts_replaced(mechanic_token)
+driver.mechanic_get_parts_replaced(mechanic2_token)
+
+# Reset password
+driver.mechanic_reset_password("Johnny", "secret2")
 
 # Record order
 order1_id = driver.order_record(
@@ -58,3 +69,7 @@ driver.order_complete(mechanic_token, order1_id)
 
 # Best mechanic
 driver.mechanic_top()
+
+# Get parts replaced in total
+driver.mechanic_get_parts_replaced(mechanic_token)
+driver.mechanic_get_parts_replaced(mechanic2_token)
