@@ -1,0 +1,14 @@
+
+                INSERT INTO orders(
+                    order_id, car_name, car_year_of_production, symptoms
+                ) VALUES(5a5bd483-0869-4395-99d7-18d48889b82b, Volkswagen Arteon Shooting Brake 2.0 BiTDI SCR 4motion, 2020, Does not start.);
+                
+                        INSERT INTO order_notes(order_id, part_replaced, cost)
+                        VALUES (5a5bd483-0869-4395-99d7-18d48889b82b, Battery, 40000.0);
+                        
+                        INSERT INTO order_notes(order_id, part_replaced, cost)
+                        VALUES (5a5bd483-0869-4395-99d7-18d48889b82b, Starter Motor, 140000.0);
+                        
+                        INSERT INTO order_notes(order_id, part_replaced, cost)
+                        VALUES (5a5bd483-0869-4395-99d7-18d48889b82b, Diesel Particulate Filter, 420000.0);
+                        
