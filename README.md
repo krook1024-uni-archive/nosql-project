@@ -30,8 +30,10 @@ Keszitsuk el egy autoszerelo muhely nyilvantartasi rendszeret.
   - a megrendelest statuszat elkeszultre allitjuk
 14. Az elkeszult megrendeleseket toroljuk 20 percenkent az adatbazisbol, amennyiben tobb, mint 200 ilyen van mar a memoriaban. A torolt rendeleseket mentsuk at egy relacios adatbazisba (ennek beszurasahoz szukseges SQL query-t irjuk le egy `queries_to_run` nevu fajlba, tetelezzuk fel, hogy egy masik, rajtunk kivul allo service elvegzi majd a beszurasokat).
 15. Lehessen meghatarozni az 5 legjobb dolgozot, ugy, hogy ezt a cimet az kapja, aki a "legtobbet hozta a konyhara", azaz aki a legnagyobb ertekben cserelt alkatreszt osszesitve.
- 
+
 # Data structures
+
+![](scheme.jpg)
 
 ## `mechanic` (hash[])
 
@@ -53,12 +55,9 @@ Keszitsuk el egy autoszerelo muhely nyilvantartasi rendszeret.
 - Car_name: string
 - Car_year_of_production: string
 - Symptoms: string
+- Is_complete: int (0 or 1)
 
 ## `order:ids` (set)
-
-## `order:completed` (list)
-
-List of completed `order_id`s.
 
 ## `order:notes` (zset)
 
